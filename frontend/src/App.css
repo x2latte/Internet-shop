@@ -1,0 +1,73 @@
+body {
+  height: 100%;
+  margin: 0;
+  overflow-y: scroll;
+  position: relative;
+  background: linear-gradient(90deg, #e52e71, #ff8a00);
+}
+
+/*.slider-thumb::before {*/
+/*  position: absolute;*/
+/*  content: "";*/
+/*  left: 0;*/
+/*  top: 12%;*/
+/*  width: 100%;*/
+/*  height: 92%;*/
+/*  background: #17141d;*/
+/*  border-radius: 50% 50% 75% 25% / 50% 50% 50% 50%; !* Изменил значения *!*/
+/*  will-change: border-radius, transform, opacity;*/
+/*  animation: sliderShape 5s linear infinite;*/
+/*  display: block;*/
+/*  z-index: -1;*/
+/*  -webkit-animation: sliderShape 5s linear infinite;*/
+/*}*/
+
+/*@keyframes sliderShape {*/
+/*  0%, 100% {*/
+/*    border-radius: 50% 50% 75% 25% / 50% 50% 50% 50%;*/
+/*    transform: translate3d(0, 0, 0) rotateZ(0.01deg);*/
+/*  }*/
+
+/*  34% {*/
+/*    border-radius: 70% 30% 46% 54% / 30% 29% 71% 70%;*/
+/*    transform: translate3d(0, 5px, 0) rotateZ(0.01deg);*/
+/*  }*/
+
+/*  50% {*/
+/*    transform: translate3d(0, 0, 0) rotateZ(0.01deg);*/
+/*  }*/
+
+/*  67% {*/
+/*    border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;*/
+/*    transform: translate3d(0, -3px, 0) rotateZ(0.01deg);*/
+/*  }*/
+/*}*/
+
+.orderTable {
+  width: 100%;
+  background-color: lemonchiffon;
+  border-collapse: collapse;
+  }
+.orderTable th {
+  text-align: center;
+  background-color: goldenrod;
+  color: white;
+  }
+.orderTable td {
+  text-align: left;
+  padding-left: 30px;
+}
+.orderTable th {
+  padding: 10px;
+  border: 1px solid goldenrod;
+}
+
+.add-product {
+  margin-top: calc(3vh + 1%);
+  margin-bottom: calc(5vh + 1%);
+}
+
+.admin-table {
+  margin-top: calc(1vh + 1%);
+  margin-bottom: calc(3vh + 1%);
+}
