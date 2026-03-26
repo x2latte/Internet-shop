@@ -1,9 +1,10 @@
 # app/utils.py
+
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from jose import jwt
+import jwt
 
-SECRET_KEY = "YOUR_SECRET_KEY_HERE"
+SECRET_KEY = "SUPER_SECRET_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
