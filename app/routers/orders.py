@@ -1,14 +1,9 @@
-# app/routers/orders.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from app import models, schemas, auth
-from fastapi.security import OAuth2PasswordBearer
-from app import database
+from app import models, schemas, database
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
 def get_db():
     db = database.SessionLocal()
@@ -19,11 +14,8 @@ def get_db():
 
 
 @router.post("/", response_model=schemas.OrderResponse)
-def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    payload = auth.jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
-    user_id = payload.get("sub")
-    
-    db_order = models.Order(user_id=user_id, total=0)
+def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
+    db_order = models.Order(user_id=order.user_id, total=0)
     db.add(db_order)
     total = 0
     for item in order.items:
@@ -42,11 +34,3 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), toke
     db.commit()
     db.refresh(db_order)
     return db_order
-
-
-@router.get("/", response_model=List[schemas.OrderResponse])
-def get_orders(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    payload = auth.jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
-    if payload.get("role") not in ["admin", "manager"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    return db.query(models.Order).all()

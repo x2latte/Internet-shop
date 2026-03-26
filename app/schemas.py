@@ -1,5 +1,3 @@
-# app//schemas.py
-
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -36,7 +34,7 @@ class BrandCreate(BaseModel):
 class BrandResponse(BrandCreate):
     id: int
     class Config:
-        from_attributes = True
+        rom_attributes = True
 
 # Продукты
 class ProductCreate(BaseModel):
@@ -73,7 +71,6 @@ class OrderItemCreate(BaseModel):
 class OrderItemResponse(BaseModel):
     product: ProductResponse
     quantity: int
-    price: float
     class Config:
         from_attributes = True
 
@@ -84,6 +81,5 @@ class OrderResponse(BaseModel):
     id: int
     user: UserResponse
     items: List[OrderItemResponse]
-    total: float
     class Config:
         from_attributes = True

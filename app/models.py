@@ -1,15 +1,13 @@
-# app/models.py
-
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float
 from sqlalchemy.orm import relationship
-from app.database import Base
+from .database import Base
 
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String, nullable=False)
+    password = Column(String, nullable=False)
     role = Column(String, default="user")
     is_active = Column(Boolean, default=True)
     orders = relationship("Order", back_populates="user")
@@ -53,7 +51,6 @@ class Order(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="orders")
     items = relationship("OrderItem", back_populates="order")
-    total = Column(Float, default=0)
 
 class OrderItem(Base):
     __tablename__ = "order_items"
@@ -61,6 +58,5 @@ class OrderItem(Base):
     order_id = Column(Integer, ForeignKey("orders.id"))
     product_id = Column(Integer, ForeignKey("products.id"))
     quantity = Column(Integer)
-    price = Column(Float)
     order = relationship("Order", back_populates="items")
     product = relationship("Product")
