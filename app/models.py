@@ -1,6 +1,22 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text, Boolean, Enum
 from sqlalchemy.orm import relationship
 from app.database import Base
+import enum
+
+class UserRole(str, enum.Enum):
+    ADMIN = "admin"
+    MANAGER = "manager"
+    USER = "user"
+
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(100), nullable=False, unique=True, index=True)
+    username = Column(String(50), nullable=False, unique=True, index=True)
+    hashed_password = Column(String(200), nullable=False)
+    role = Column(Enum(UserRole), default=UserRole.USER, nullable=False)
+    is_active = Column(Boolean, default=True)
 
 class Category(Base):
     __tablename__ = "categories"

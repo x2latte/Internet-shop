@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional, List
+import enum
 
 class CategoryBase(BaseModel):
     name: str
@@ -67,3 +68,39 @@ class Product(ProductBase):
     images: List[ProductImage] = []
     class Config:
         from_attributes = True
+
+class UserRole(str, enum.Enum):
+    ADMIN = "admin"
+    MANAGER = "manager"
+    USER = "user"
+
+class UserBase(BaseModel):
+    email: EmailStr
+    username: str
+    role: UserRole = UserRole.USER
+
+class UserCreate(UserBase):
+    password: str
+
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    username: Optional[str] = None
+    role: Optional[UserRole] = None
+    is_active: Optional[bool] = None
+
+class User(UserBase):
+    id: int
+    is_active: bool
+    class Config:
+        from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str

@@ -1,5 +1,7 @@
 import sys
 from pathlib import Path
+
+# Добавляем путь к проекту
 sys.path.append(str(Path(__file__).parent.parent))
 
 from app.database import Base
@@ -7,7 +9,7 @@ from app import models  # noqa
 
 target_metadata = Base.metadata
 
-# Остальное содержимое оставьте как есть
+# Остальной код из стандартного alembic/env.py
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool

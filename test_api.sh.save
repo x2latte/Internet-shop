@@ -1,0 +1,82 @@
+#!/bin/bash
+set -e  # остановка при ошибке (можно убрать, если хотим продолжить)
+echo "========================================="
+echo "Тестирование API интернет-магазина"
+echo "========================================="
+
+BASE_URL="http://localhost:8000"
+
+# 1. Регистрация пользователей (если уже существуют, проигнорируем ошибку)
+echo -e "\n1. Регистрация пользователей..."
+curl -s -X POST "$BASE_URL/auth/register" -H "Content-Type: application/json" -d '{"email":"user@test.com","username":"user","password":"user123","role":"user"}' || true
+curl -s -X POST "$BASE_URL/auth/register" -H "Content-Type: application/json" -d '{"email":"manager@test.com","username":"manager","password":"manager123","role":"manager"}' || true
+curl -s -X POST "$BASE_URL/auth/register" -H "Content-Type: application/json" -d '{"email":"admin@test.com","username":"admin","password":"admin123","role":"admin"}' || true
+
+# 2. Логин и получение токенов
+echo -e "\n2. Получение токенов..."
+TOKEN_USER=$(curl -s -X POST "$BASE_URL/auth/login" -H "Content-Type: application/x-www-form-urlencoded" -d "username=user&password=user123" | jq -r '.access_token')
+TOKEN_MANAGER=$(curl -s -X POST "$BASE_URL/auth/login" -H "Content-Type: application/x-www-form-urlencoded" -d "username=manager&password=manager123" | jq -r '.access_token')
+TOKEN_ADMIN=$(curl -s -X POST "$BASE_URL/auth/login" -H "Content-Type: application/x-www-form-urlencoded" -d "username=admin&password=admin123" | jq -r '.access_token')
+
+echo "Токен user: ${TOKEN_USER:0:20}..."
+echo "Токен manager: ${TOKEN_MANAGER:0:20}..."
+echo "Токен admin: ${TOKEN_ADMIN:0:20}..."
+
+# 3. Создание категории (админ)
+echo -e "\n3. Создание категории (админ)..."
+CATEGORY_ID=$(curl -s -X POST "$BASE_URL/categories/" -H "Authorization: Bearer $TOKEN_ADMIN" -H "Content-Type: application/json" -d '{"name":"Электроника","description":"Техника и гаджеты"}' | jq -r '.id')
+echo "Category ID: $CATEGORY_ID"
+
+# 4. Создание бренда (админ)
+echo -e "\n4. Создание бренда (админ)..."
+BRAND_ID=$(curl -s -X POST "$BASE_URL/brands/" -H "Authorization: Bearer $TOKEN_ADMIN" -H "Content-Type: application/json" -d '{"name":"Apple"}' | jq -r '.id')
+echo "Brand ID: $BRAND_ID"
+
+# 5. Создание товара (менеджер)
+echo -e "\n5. Создание товара (менеджер)..."
+PRODUCT_ID=$(curl -s -X POST "$BASE_URL/products/" -H "Authorization: Bearer $TOKEN_MANAGER" -H "Content-Type: application/json" -d "{\"name\":\"iPhone 15 Pro\",\"description\":\"Флагманский смартфон\",\"price\":99900,\"category_id\":$CATEGORY_ID,\"brand_id\":$BRAND_ID}" | jq -r '.id')
+echo "Product ID: $PRODUCT_ID"
+
+# 6. Добавление изображения (менеджер)
+echo -e "\n6. Добавление изображения..."
+IMAGE_ID=$(curl -s -X POST "$BASE_URL/images/?product_id=$PRODUCT_ID" -H "Authorization: Bearer $TOKEN_MANAGER" -H "Content-Type: application/json" -d '{"image_url":"https://example.com/iphone15.jpg"}' | jq -r '.id')
+echo "Image ID: $IMAGE_ID"
+
+# 7. Получение списка товаров (публичный)
+echo -e "\n7. Список товаров (публичный):"
+curl -s -X GET "$BASE_URL/products/" | jq '.[] | {id, name, price}'
+
+# 8. Поиск товаров
+echo -e "\n8. Поиск товаров (iPhone):"
+curl -s -X GET "$BASE_URL/products/?search=iPhone" | jq '.[] | {id, name}'
+
+# 9. Пагинация
+echo -e "\n9. Пагинация (skip=0, limit=2):"
+curl -s -X GET "$BASE_URL/products/?skip=0&limit=2" | jq 'length'
+
+# 10. Получение изображений товара
+echo -e "\n10. Изображения товара $PRODUCT_ID:"
+curl -s -X GET "$BASE_URL/images/product/$PRODUCT_ID" | jq '.[] | .image_url'
+
+# 11. Обновление товара (менеджер)
+echo -e "\n11. Обновление товара (менеджер)..."
+curl -s -X PUT "$BASE_URL/products/$PRODUCT_ID" -H "Authorization: Bearer $TOKEN_MANAGER" -H "Content-Type: application/json" -d '{"name":"iPhone 15 Pro Max","price":109900}' | jq '{id, name, price}'
+
+# 12. Удаление товара (админ)
+echo -e "\n12. Удаление товара (админ)..."
+curl -s -X DELETE "$BASE_URL/products/$PRODUCT_ID" -H "Authorization: Bearer $TOKEN_ADMIN" | jq '.'
+
+# 13. Проверка прав: попытка создать товар от имени обычного пользователя (должно быть 403)
+echo -e "\n13. Попытка создать товар от имени обычного пользователя (ожидается 403):"
+curl -s -w "\nHTTP Status: %{http_code}\n" -X POST "$BASE_URL/products/" -H "Authorization: Bearer $TOKEN_USER" -H "Content-Type: application/json" -d "{\"name\":\"Тестовый товар\",\"description\":\"Попытка\",\"price\":100,\"category_id\":$CATEGORY_ID,\"brand_id\":$BRAND_ID}"
+
+# 14. Информация о текущем пользователе (админ)
+echo -e "\n14. Информация о текущем пользователе (админ):"
+curl -s -X GET "$BASE_URL/auth/me" -H "Authorization: Bearer $TOKEN_ADMIN" | jq '{id, username, email, role}'
+
+# 15. Список всех пользователей (только админ)
+echo -e "\n15. Список всех пользователей (админ):"
+curl -s -X GET "$BASE_URL/auth/users" -H "Authorization: Bearer $TOKEN_ADMIN" | jq '.[] | {id, username, email, role}'
+
+echo -e "\n========================================="
+echo "Тестирование завершено!"A

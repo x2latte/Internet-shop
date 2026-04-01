@@ -1,0 +1,51 @@
+# Виртуальное окружение
+venv/
+env/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Базы данных
+*.db
+*.sqlite
+*.sqlite3
+
+# Переменные окружения
+.env
+.env.local
+.env.*.local
+
+# Логи
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Тесты и покрытие
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Alembic (миграции коммитим, но временные файлы не нужны)
+alembic/__pycache__/
+
+# Прочие временные файлы
+*.pyc
+*.pyo
+*.pyd
+*.tmp
+
+# Файлы, сгенерированные в процессе разработки (удалите, если они не нужны в репозитории)
+create_admin.py
+test_api.sh
