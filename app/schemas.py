@@ -1,85 +1,69 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional, List
 
-# Пользователи
-class UserCreate(BaseModel):
+class CategoryBase(BaseModel):
     name: str
-    email: str
-    password: str
-    role: Optional[str] = "user"
+    description: Optional[str] = None
 
-class UserResponse(BaseModel):
-    id: int
-    name: str
-    email: str
-    role: str
-    is_active: bool
-    class Config:
-        from_attributes = True
+class CategoryCreate(CategoryBase):
+    pass
 
-# Категории
-class CategoryCreate(BaseModel):
-    name: str
-    description: Optional[str] = ""
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
 
-class CategoryResponse(CategoryCreate):
+class Category(CategoryBase):
     id: int
     class Config:
         from_attributes = True
 
-# Бренды
-class BrandCreate(BaseModel):
+class BrandBase(BaseModel):
     name: str
 
-class BrandResponse(BrandCreate):
+class BrandCreate(BrandBase):
+    pass
+
+class BrandUpdate(BaseModel):
+    name: Optional[str] = None
+
+class Brand(BrandBase):
     id: int
     class Config:
-        rom_attributes = True
+        from_attributes = True
 
-# Продукты
-class ProductCreate(BaseModel):
+class ProductImageBase(BaseModel):
+    image_url: str
+
+class ProductImageCreate(ProductImageBase):
+    pass
+
+class ProductImage(ProductImageBase):
+    id: int
+    product_id: int
+    class Config:
+        from_attributes = True
+
+class ProductBase(BaseModel):
     name: str
-    description: str
+    description: Optional[str] = None
     price: float
-    count_in_stock: int
     category_id: int
     brand_id: int
 
-class ProductResponse(ProductCreate):
+class ProductCreate(ProductBase):
+    pass
+
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    category_id: Optional[int] = None
+    brand_id: Optional[int] = None
+
+class Product(ProductBase):
     id: int
-    category: CategoryResponse
-    brand: BrandResponse
-    images: List["ImageResponse"] = []
-    class Config:
-        from_attributes = True
-
-# Изображения
-class ImageCreate(BaseModel):
-    url: str
-    product_id: int
-
-class ImageResponse(ImageCreate):
-    id: int
-    class Config:
-        from_attributes = True
-
-# Заказы
-class OrderItemCreate(BaseModel):
-    product_id: int
-    quantity: int
-
-class OrderItemResponse(BaseModel):
-    product: ProductResponse
-    quantity: int
-    class Config:
-        from_attributes = True
-
-class OrderCreate(BaseModel):
-    items: List[OrderItemCreate]
-
-class OrderResponse(BaseModel):
-    id: int
-    user: UserResponse
-    items: List[OrderItemResponse]
+    category: Category
+    brand: Brand
+    images: List[ProductImage] = []
     class Config:
         from_attributes = True

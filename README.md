@@ -4,3 +4,7 @@
 **Руководитель практики:** ст. преподаватель В. М. Димитров 
 
 Проект интеренет магазина на Fastapi и react с применением sqlalchemy, redux, and Postgresql
+
+lsof -ti:8000 | xargs kill -9 2>/dev/null
+./venv/bin/uvicorn app.main:app --reload
+
