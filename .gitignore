@@ -49,3 +49,19 @@ alembic/__pycache__/
 # Файлы, сгенерированные в процессе разработки (удалите, если они не нужны в репозитории)
 create_admin.py
 test_api.sh
+
+test.db
+.pytest_cache/
+tests/__pycache__/
+
+__pycache__/
+*.pyc
+*.db
+*.sqlite
+.env
+.pytest_cache/
+.DS_Store
+*.log
+test_all.sh
+create_admin.py
+EOF

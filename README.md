@@ -16,3 +16,6 @@ lsof -ti:8000 | xargs kill -9 2>/dev/null
 
 git rm -r --cached .
 git add .
+
+
+pytest tests/ -v

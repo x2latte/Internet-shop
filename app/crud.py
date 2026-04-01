@@ -127,3 +127,61 @@ def delete_image(db: Session, image_id: int):
 # Дополнительная функция для получения всех изображений с пагинацией
 def get_all_images(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.ProductImage).offset(skip).limit(limit).all()
+
+from sqlalchemy.orm import Session
+from app import models, schemas
+
+def create_order(db: Session, order: schemas.OrderCreate, user_id: int):
+    # Рассчитываем общую сумму и создаем позиции
+    total = 0.0
+    items = []
+    for item in order.items:
+        product = db.query(models.Product).filter(models.Product.id == item.product_id).first()
+        if not product:
+            raise ValueError(f"Product {item.product_id} not found")
+        if product.price <= 0:
+            raise ValueError(f"Invalid price for product {item.product_id}")
+        price = product.price
+        total += price * item.quantity
+        items.append(models.OrderItem(
+            product_id=item.product_id,
+            quantity=item.quantity,
+            price_at_time=price
+        ))
+    
+    db_order = models.Order(
+        user_id=user_id,
+        total_price=total,
+        status="pending"
+    )
+    db.add(db_order)
+    db.flush()  # чтобы получить order.id
+    
+    for item in items:
+        item.order_id = db_order.id
+        db.add(item)
+    
+    db.commit()
+    db.refresh(db_order)
+    return db_order
+
+def get_orders_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+    return db.query(models.Order).filter(models.Order.user_id == user_id).offset(skip).limit(limit).all()
+
+def get_order(db: Session, order_id: int, user_id: int = None):
+    query = db.query(models.Order).filter(models.Order.id == order_id)
+    if user_id:
+        query = query.filter(models.Order.user_id == user_id)
+    return query.first()
+
+def update_order_status(db: Session, order_id: int, status: str):
+    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    if not order:
+        return None
+    order.status = status
+    db.commit()
+    db.refresh(order)
+    return order
+
+def get_all_orders(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Order).offset(skip).limit(limit).all()

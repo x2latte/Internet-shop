@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
+from datetime import datetime
 import enum
 
 class CategoryBase(BaseModel):
@@ -104,3 +105,39 @@ class TokenData(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+# OrderItem
+class OrderItemBase(BaseModel):
+    product_id: int
+    quantity: int
+
+class OrderItemCreate(OrderItemBase):
+    pass
+
+class OrderItem(OrderItemBase):
+    id: int
+    order_id: int
+    price_at_time: float
+    product: Product
+    class Config:
+        from_attributes = True
+
+class OrderBase(BaseModel):
+    pass
+
+class OrderCreate(BaseModel):
+    items: List[OrderItemCreate]  # список товаров с количеством
+
+class OrderUpdate(BaseModel):
+    status: Optional[str] = None
+
+class Order(OrderBase):
+    id: int
+    user_id: int
+    created_at: datetime
+    status: str
+    total_price: float
+    items: List[OrderItem] = []
+    user: User
+    class Config:
+        from_attributes = True
