@@ -13,3 +13,7 @@ lsof -ti:8000 | xargs kill -9 2>/dev/null
 
 Запуск тестировки:
 chmod +x test_full.sh
+
+frontend:
+lsof -ti:3000 | xargs kill -9
+cd admin-panel && npm start
