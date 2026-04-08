@@ -137,11 +137,19 @@
 // // const Products = () => <div>Products Page</div>;
 // // export default Products;
 
-
+// import React, { useState, useEffect } from 'react';
+// import {
+//   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+//   Paper, Button, TextField, IconButton, Dialog, DialogTitle, DialogContent,
+//   DialogActions, Box, Typography
+// } from '@mui/material';
+// import { Edit, Delete, Add, Image } from '@mui/icons-material';
+// import { getProducts, createProduct, updateProduct, deleteProduct } from '../api';
+// import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Alert, Snackbar } from '@mui/material';
-import api from '../api';
+import api from '../Api';
 
 export default function Products() {
   const [products, setProducts] = useState([]);

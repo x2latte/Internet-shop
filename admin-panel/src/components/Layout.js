@@ -1,6 +1,6 @@
 import { Outlet, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Box } from '@mui/material';
-import { Inventory, Category, BrandingWatermark } from '@mui/icons-material';
+import { Inventory, Category, BrandingWatermark, ShoppingCart } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -18,6 +18,10 @@ export default function Layout() {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
+            <ListItem button component={Link} to="/orders">
+              <ListItemIcon><ShoppingCart /></ListItemIcon>
+              <ListItemText primary="Orders" />
+            </ListItem>
             <ListItem button component={Link} to="/products">
               <ListItemIcon><Inventory /></ListItemIcon>
               <ListItemText primary="Products" />
@@ -40,16 +44,3 @@ export default function Layout() {
     </Box>
   );
 }
-
-
-// import { Outlet } from 'react-router-dom';
-// import React from 'react';
-// const Layout = () => {
-//   return (
-//     <div>
-//       <h2>Admin Menu</h2>
-//       <Outlet />
-//     </div>
-//   );
-// };
-// export default Layout;

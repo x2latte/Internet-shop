@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DeleteIcon from '@mui/icons-material/Delete';
-import api from '../api';
+import api from '../Api';
 
 export default function Shop() {
   const [products, setProducts] = useState([]);

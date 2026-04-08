@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Alert, Snackbar } from '@mui/material';
-import api from '../api';
+import api from '../Api';
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);

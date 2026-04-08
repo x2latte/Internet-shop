@@ -70,3 +70,16 @@ def update_order_status(
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
+
+@router.delete("/{order_id}")
+def delete_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.check_manager_or_admin_role)
+):
+    order = crud.get_order(db, order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    db.delete(order)
+    db.commit()
+    return {"message": "Order deleted successfully"}
