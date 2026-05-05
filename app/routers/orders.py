@@ -1,25 +1,36 @@
 # app/routers/orders.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 from app import crud, schemas, models, auth
 from app.database import get_db
+from app.websocket_manager import manager
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
 @router.post("/", response_model=schemas.Order)
-def create_order(
+async def create_order(
     order: schemas.OrderCreate,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_active_user)
 ):
-    """Создать заказ (только для авторизованных пользователей)"""
+    """Создать заказ и уведомить менеджеров"""
     try:
-        return crud.create_order(db, order, current_user.id)
+        db_order = crud.create_order(db, order, current_user.id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/", response_model=List[schemas.Order])
+    # Отправка уведомления
+    notification = {
+        "type": "new_order",
+        "order_id": db_order.id,
+        "user": current_user.username,
+        "total": db_order.total_price,
+        "status": db_order.status
+    }
+    await manager.broadcast(notification)
+    return db_order
+
+@router.get("/", response_model=list[schemas.Order])
 def read_my_orders(
     skip: int = 0,
     limit: int = 100,
@@ -36,7 +47,7 @@ def read_order(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_active_user)
 ):
-    """Получить детали заказа (только владелец или админ)"""
+    """Получить детали заказа (владелец или админ)"""
     if current_user.role == models.UserRole.ADMIN:
         order = crud.get_order(db, order_id)
     else:
@@ -45,8 +56,7 @@ def read_order(
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
-# Эндпоинты для админов/менеджеров
-@router.get("/admin/all", response_model=List[schemas.Order])
+@router.get("/admin/all", response_model=list[schemas.Order])
 def read_all_orders(
     skip: int = 0,
     limit: int = 100,

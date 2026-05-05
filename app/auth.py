@@ -90,3 +90,26 @@ def check_manager_or_admin_role(current_user: models.User = Depends(get_current_
             detail="Manager or admin role required"
         )
     return current_user
+
+
+# (дополнить)
+from fastapi import HTTPException
+from jose import JWTError, jwt
+from app.database import SessionLocal
+from app import models
+
+async def get_current_user_ws(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401)
+    except JWTError:
+        raise HTTPException(status_code=401)
+    db = SessionLocal()
+    user = db.query(models.User).filter(models.User.username == username).first()
+    db.close()
+    if user is None:
+        raise HTTPException(status_code=401)
+    return user
+
