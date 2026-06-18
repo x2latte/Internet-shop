@@ -22,39 +22,11 @@ cd admin-panel && npm start
 # Посмотреть всех пользователей бд
 sqlite3 ecommerce.db "SELECT * FROM users;"
 
-
-# Деактивировать текущее окружение, если активно
-deactivate
-
-# Удалить старую папку venv
-rm -rf venv
-
-# Создать новое виртуальное окружение с python3.10 (или 3.11)
-python3.10 -m venv venv
-# Если нет python3.10, попробуйте python3.11 или просто python3 (но тогда проверьте версию)
-
-# Активировать
-source venv/bin/activate
-
-# Установить зависимости
-pip install -r requirements.txt
-
-# Применить миграции
-alembic upgrade head
-
-# Создать админа
-python create_admin.py   # или python3, если python недоступен
-
-# Запустить сервер
-uvicorn app.main:app --reload
-
-cd "/Users/a1111/Documents/Ucheba/6 сем/Internet-shop"
-source venv/bin/activate
-python fill_db.py
-
-cd "/Users/a1111/Documents/Ucheba/6 сем/Internet-shop"
-source venv/bin/activate
+# Очистка бд и подготовка к заполнению данными 
 rm -f ecommerce.db         
 alembic upgrade head        
-python create_admin.py      
-python fill_db.py           
+
+# Новые скрипты
+source venv/bin/activate
+python create_admin.py 
+python fill_db.py
